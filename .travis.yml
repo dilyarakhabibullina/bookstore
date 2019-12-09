@@ -1,0 +1,14 @@
+language: java
+jdk: oraclejdk12
+script: mvn -e verify
+notifications:
+  email:
+    recipients:
+      - khdilyara@rambler.ru
+    on_failure: always
+    on_success: always
+deploy:
+  provider: heroku
+  api_key: $HEROKU_KEY
+  app: itpark-dilyara708-books
+
