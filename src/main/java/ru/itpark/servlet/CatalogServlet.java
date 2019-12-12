@@ -1,5 +1,6 @@
 package ru.itpark.servlet;
 
+import ru.itpark.constant.Constants;
 import ru.itpark.service.BookService;
 import ru.itpark.service.FileService;
 
@@ -16,7 +17,8 @@ public class CatalogServlet extends HttpServlet {
     private BookService bookService;
     private FileService fileService;
 
-    @Override
+
+       @Override
     public void init() throws ServletException {
         InitialContext context = null;
         try {
@@ -28,6 +30,7 @@ public class CatalogServlet extends HttpServlet {
             e.printStackTrace();
             throw new ServletException(e);
         }
+
     }
 
     @Override
@@ -40,22 +43,57 @@ public class CatalogServlet extends HttpServlet {
             e.printStackTrace();
             throw new ServletException(e);
         }
+        String url = req.getRequestURI().substring(req.getContextPath().length());
+        System.out.println(url);
+
+//        if (url.equals("/search")) {
+////            if (req.getMethod().equals("GET")) {
+////                try {
+////                    req.setAttribute(Constants.ITEMS, bookService.getAll());
+////                } catch (SQLException e) {
+////                    e.printStackTrace();
+////                }
+////                req.getRequestDispatcher("/WEB-INF/search.jsp").forward(req, resp);
+////                return;
+////            }
+////        }
+
+//        if (url.equals("/hous")) {
+//            req.getRequestDispatcher("/WEB-INF/search.jsp").forward(req, resp);
+//            resp.getWriter().write("super");
+//            return;
+//        }
+
     }
 //что означает req.getPart?
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        try {
-            var name = req.getParameter("name");
-            var author = req.getParameter("author");
-            var part = req.getPart("file");
+        @Override
+        protected void doPost (HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            try {
+                var name = req.getParameter("name");
+                var author = req.getParameter("author");
+                var part = req.getPart("file");
 
-            var file = fileService.writeFile(part);
+                var file = fileService.writeFile(part);
 
-            bookService.create(name, author, file);
-            resp.sendRedirect(String.join("/", req.getContextPath(), req.getServletPath()));
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new ServletException(e);
+                bookService.create(name, author, file);
+                resp.sendRedirect(String.join("/", req.getContextPath(), req.getServletPath()));
+            } catch (SQLException e) {
+                e.printStackTrace();
+                throw new ServletException(e);
+            }
+            String url = req.getRequestURI().substring(req.getContextPath().length());
+            System.out.println(url);
+
+//            if (url.equals("/search")) {
+//                if (req.getMethod().equals("GET")) {
+//                    try {
+//                        req.setAttribute(Constants.ITEMS, bookService.getAll());
+//                    } catch (SQLException e) {
+//                        e.printStackTrace();
+//                    }
+//                    req.getRequestDispatcher("/WEB-INF/search.jsp").forward(req, resp);
+//                    return;
+//                }
+//            }
         }
     }
-}

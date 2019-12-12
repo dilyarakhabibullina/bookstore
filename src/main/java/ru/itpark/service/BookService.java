@@ -6,9 +6,8 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class BookService {
     private final DataSource ds;
@@ -55,5 +54,30 @@ public class BookService {
         }
     }
 
-    
+
+
+
+
+
+//    public Collection<Book> getAll() {
+//        return books;
+//    }
+
+    public Collection<Book> searchByAuthor(String author) {
+                    Collection<Book> books = new LinkedList<>();
+//            books.add(new Book ("1","w","carrol","www"));
+//            books.add(new Book ("1","w","hem","www"));
+//            books.add(new Book ("1","w","lensioni","www"));
+
+        return books.stream()
+                .filter(o -> o.getAuthor().equals(author))
+                .collect(Collectors.toList());
+    }
+
+//    public Collection<House> searchByUnderground(String underground) {
+//        return items.stream()
+//                .filter(o -> o.getUndergrounds().contains(underground))
+//                .collect(Collectors.toList());
+//    }
+
 }
