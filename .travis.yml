@@ -10,5 +10,5 @@ notifications:
 deploy:
   provider: heroku
   api_key: $HEROKU_KEY
-  app: itpark-dilyara708-books
+  app: itpark-dilyara708-books1
 
