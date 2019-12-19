@@ -1,6 +1,7 @@
 package ru.itpark.servlet;
 
 import ru.itpark.constant.Constants;
+import ru.itpark.domain.Book;
 import ru.itpark.service.BookService;
 import ru.itpark.service.FileService;
 
@@ -12,13 +13,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 public class CatalogServlet extends HttpServlet {
     private BookService bookService;
     private FileService fileService;
 
 
-       @Override
+    @Override
     public void init() throws ServletException {
         InitialContext context = null;
         try {
@@ -35,6 +39,9 @@ public class CatalogServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String url = req.getRequestURI().substring(req.getContextPath().length());
+        System.out.println(url);
+
         try {
             req.setAttribute("items", bookService.getAll());
             req.getRequestDispatcher("/WEB-INF/catalog.jsp").forward(req, resp);
@@ -43,8 +50,25 @@ public class CatalogServlet extends HttpServlet {
             e.printStackTrace();
             throw new ServletException(e);
         }
-        String url = req.getRequestURI().substring(req.getContextPath().length());
-        System.out.println(url);
+
+        if (url.equals("/search")) {
+            final String q = req.getParameter("q");
+            final Collection<Book> foundByAuthor = bookService.searchByAuthor(q);
+           // final Collection<House> foundByDistrict = service.searchByDistrict(q);
+
+            Set<Book> items = new HashSet<>();
+            items.addAll(foundByAuthor);
+          //  items.addAll(foundByDistrict);
+
+            req.setAttribute(Constants.ITEMS, items);
+            req.setAttribute(Constants.SEARCH_QUERY, q);
+
+            req.getRequestDispatcher("/WEB-INF/search.jsp").forward(req, resp);
+            return;
+        }
+
+//        String url = req.getRequestURI().substring(req.getContextPath().length());
+//        System.out.println(url);
 
 //        if (url.equals("/search")) {
 ////            if (req.getMethod().equals("GET")) {
@@ -65,24 +89,25 @@ public class CatalogServlet extends HttpServlet {
 //        }
 
     }
-//что означает req.getPart?
-        @Override
-        protected void doPost (HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-            try {
-                var name = req.getParameter("name");
-                var author = req.getParameter("author");
-                var part = req.getPart("file");
 
-                var file = fileService.writeFile(part);
+    //что означает req.getPart?
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        try {
+            var name = req.getParameter("name");
+            var author = req.getParameter("author");
+            var part = req.getPart("file");
 
-                bookService.create(name, author, file);
-                resp.sendRedirect(String.join("/", req.getContextPath(), req.getServletPath()));
-            } catch (SQLException e) {
-                e.printStackTrace();
-                throw new ServletException(e);
-            }
-            String url = req.getRequestURI().substring(req.getContextPath().length());
-            System.out.println(url);
+            var file = fileService.writeFile(part);
+
+            bookService.create(name, author, file);
+            resp.sendRedirect(String.join("/", req.getContextPath(), req.getServletPath()));
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new ServletException(e);
+        }
+        String url = req.getRequestURI().substring(req.getContextPath().length());
+        System.out.println(url);
 
 //            if (url.equals("/search")) {
 //                if (req.getMethod().equals("GET")) {
@@ -95,5 +120,5 @@ public class CatalogServlet extends HttpServlet {
 //                    return;
 //                }
 //            }
-        }
     }
+}

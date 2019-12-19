@@ -1,5 +1,6 @@
 <%@ page import="ru.itpark.domain.Book" %>
 <%@ page import="java.util.List" %>
+<%@ page import="ru.itpark.constant.Constants" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!doctype html>
 <html lang="en">
@@ -17,6 +18,14 @@
     <div class="row">
         <div class="col">
             <h1>Catalog</h1>
+
+            <form action="<%= request.getContextPath() %>/search">
+
+                <input name="q" placeholder="Поиск" value="<%= request.getAttribute(Constants.SEARCH_QUERY) == null ? "" : request.getAttribute(Constants.SEARCH_QUERY) %>">
+                <%-- если поле всего одно, то Enter приводит к отправке формы --%>
+            </form>
+
+
             <div class="row">
                 <%--
         1. откуда взялось items в качестве параметра getAttribute?

@@ -13,7 +13,7 @@
     <title>Document</title>
 </head>
 <body>
-    <form action="<%= request.getContextPath() %>/houses/search">
+    <form action="<%= request.getContextPath() %>/search">
         <input name="district" placeholder="Поиск по району">
         <%-- если поле всего одно, то Enter приводит к отправке формы --%>
     </form>
