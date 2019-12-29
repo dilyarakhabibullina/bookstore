@@ -42,28 +42,26 @@ public class CatalogServlet extends HttpServlet {
         String url = req.getRequestURI().substring(req.getContextPath().length());
         System.out.println(url);
 
-        try {
-            req.setAttribute("items", bookService.getAll());
-            req.getRequestDispatcher("/WEB-INF/catalog.jsp").forward(req, resp);
+        if (url.equals("/")) {
+            try {
+                req.setAttribute("items", bookService.getAll());
+                req.getRequestDispatcher("/WEB-INF/catalog.jsp").forward(req, resp);
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new ServletException(e);
+            } catch (SQLException e) {
+                e.printStackTrace();
+                throw new ServletException(e);
+            }
+            return;
         }
 
         if (url.equals("/search")) {
             final String q = req.getParameter("q");
-            final Collection<Book> foundByAuthor = bookService.searchByAuthor(q);
-           // final Collection<House> foundByDistrict = service.searchByDistrict(q);
-
-            Set<Book> items = new HashSet<>();
-            items.addAll(foundByAuthor);
-          //  items.addAll(foundByDistrict);
+            final Collection<Book> items = bookService.searchByAuthor(q);
 
             req.setAttribute(Constants.ITEMS, items);
             req.setAttribute(Constants.SEARCH_QUERY, q);
 
-            req.getRequestDispatcher("/WEB-INF/search.jsp").forward(req, resp);
+            req.getRequestDispatcher("/WEB-INF/catalog.jsp").forward(req, resp);
             return;
         }
 
@@ -98,10 +96,14 @@ public class CatalogServlet extends HttpServlet {
             var author = req.getParameter("author");
             var part = req.getPart("file");
 
-            var file = fileService.writeFile(part);
+            if (part.getSize() != 0) {
+                var file = fileService.writeFile(part);
+                bookService.create(name, author, file);
+            } else {
+                bookService.create(name, author, null);
+            }
 
-            bookService.create(name, author, file);
-            resp.sendRedirect(String.join("/", req.getContextPath(), req.getServletPath()));
+            resp.sendRedirect(req.getRequestURI());
         } catch (SQLException e) {
             e.printStackTrace();
             throw new ServletException(e);

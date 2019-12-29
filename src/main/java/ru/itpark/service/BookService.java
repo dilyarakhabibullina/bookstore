@@ -1,6 +1,7 @@
 package ru.itpark.service;
 
 import ru.itpark.domain.Book;
+import ru.itpark.exception.DataAccessException;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -47,7 +48,7 @@ public class BookService {
                 stmt.setString(1, UUID.randomUUID().toString());
                 stmt.setString(2, name.toLowerCase());
                 stmt.setString(3, author.toLowerCase());
-                stmt.setString(4, file.toLowerCase());
+                stmt.setString(4, file);
                 stmt.execute();
 
             }
@@ -55,12 +56,13 @@ public class BookService {
     }
 
     public Collection<Book> searchByAuthor(String author) {
-                    Collection<Book> books = new LinkedList<>();
-//
-
-        return books.stream()
-                .filter(o -> o.getAuthor().equals(author))
-                .collect(Collectors.toList());
+        try {
+            return getAll().stream()
+                    .filter(o -> o.getAuthor().equals(author))
+                    .collect(Collectors.toList());
+        } catch (SQLException e) {
+            throw new DataAccessException(e);
+        }
     }
 
 
